@@ -107,7 +107,7 @@ func (m *MetadataV14) FindEventNamesForEventID(eventID EventID) (Text, Text, err
 		if !mod.HasEvents {
 			continue
 		}
-		if mod.Index != eventID[0] {
+		if mod.Index != NewU8(eventID[0]) {
 			continue
 		}
 		eventType := mod.Events.Type.Int64()
@@ -180,7 +180,7 @@ type PalletMetadataV14 struct {
 	Constants  []ConstantMetadataV14
 	HasErrors  bool
 	Errors     ErrorMetadataV14
-	Index      uint8
+	Index      U8
 }
 
 type FunctionMetadataV14 struct {
@@ -208,40 +208,19 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	err = decoder.Decode(&m.HasStorage)
+	err = decoder.DecodeOption(&m.HasStorage, &m.Storage)
 	if err != nil {
 		return err
 	}
 
-	if m.HasStorage {
-		err = decoder.Decode(&m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasCalls)
+	err = decoder.DecodeOption(&m.HasCalls, &m.Calls)
 	if err != nil {
 		return err
 	}
 
-	if m.HasCalls {
-		err = decoder.Decode(&m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = decoder.Decode(&m.HasEvents)
+	err = decoder.DecodeOption(&m.HasEvents, &m.Events)
 	if err != nil {
 		return err
-	}
-
-	if m.HasEvents {
-		err = decoder.Decode(&m.Events)
-		if err != nil {
-			return err
-		}
 	}
 
 	err = decoder.Decode(&m.Constants)
@@ -249,16 +228,9 @@ func (m *PalletMetadataV14) Decode(decoder scale.Decoder) error {
 		return err
 	}
 
-	err = decoder.Decode(&m.HasErrors)
+	err = decoder.DecodeOption(&m.HasErrors, &m.Errors)
 	if err != nil {
 		return err
-	}
-
-	if m.HasErrors {
-		err = decoder.Decode(&m.Errors)
-		if err != nil {
-			return err
-		}
 	}
 
 	return decoder.Decode(&m.Index)
@@ -270,40 +242,19 @@ func (m PalletMetadataV14) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	err = encoder.Encode(m.HasStorage)
+	err = encoder.EncodeOption(m.HasStorage, m.Storage)
 	if err != nil {
 		return err
 	}
 
-	if m.HasStorage {
-		err = encoder.Encode(m.Storage)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasCalls)
+	err = encoder.EncodeOption(m.HasCalls, m.Calls)
 	if err != nil {
 		return err
 	}
 
-	if m.HasCalls {
-		err = encoder.Encode(m.Calls)
-		if err != nil {
-			return err
-		}
-	}
-
-	err = encoder.Encode(m.HasEvents)
+	err = encoder.EncodeOption(m.HasEvents, m.Events)
 	if err != nil {
 		return err
-	}
-
-	if m.HasEvents {
-		err = encoder.Encode(m.Events)
-		if err != nil {
-			return err
-		}
 	}
 
 	err = encoder.Encode(m.Constants)
@@ -311,16 +262,9 @@ func (m PalletMetadataV14) Encode(encoder scale.Encoder) error {
 		return err
 	}
 
-	err = encoder.Encode(m.HasErrors)
+	err = encoder.EncodeOption(m.HasErrors, m.Errors)
 	if err != nil {
 		return err
-	}
-
-	if m.HasErrors {
-		err = encoder.Encode(m.Errors)
-		if err != nil {
-			return err
-		}
 	}
 
 	return encoder.Encode(m.Index)
@@ -338,14 +282,6 @@ func (m *PalletMetadataV14) FindConstantValue(constant Text) ([]byte, error) {
 type StorageMetadataV14 struct {
 	Prefix Text
 	Items  []StorageEntryMetadataV14
-}
-
-func (storage *StorageMetadataV14) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&storage.Prefix)
-	if err != nil {
-		return err
-	}
-	return decoder.Decode(&storage.Items)
 }
 
 type StorageEntryMetadataV14 struct {
